@@ -5,6 +5,24 @@
   </head>
   <body>
     <div id="cesiumContainer"></div>
+    <div id="controls">
+      <label>
+        Terrain
+        <select id="terrain">
+          <option value="reearth">re:earth</option>
+          <option value="ion">Cesium World Terrain</option>
+          <option value="flat">Flat</option>
+        </select>
+      </label>
+      <label>
+        Imagery
+        <select id="imagery">
+          <option value="esri">Esri</option>
+          <option value="osm">OSM</option>
+        </select>
+      </label>
+      <span id="note"></span>
+    </div>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
