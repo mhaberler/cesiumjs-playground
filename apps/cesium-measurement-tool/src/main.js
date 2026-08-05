@@ -337,6 +337,8 @@ initGeocode();
 const measureBtn = document.getElementById("measure");
 const measureControls = document.getElementById("measure-controls");
 const measureStraight = document.getElementById("measure-straight");
+const measureVertical = document.getElementById("measure-vertical");
+const measureHorizontal = document.getElementById("measure-horizontal");
 const measureGround = document.getElementById("measure-ground");
 const measureTool = initMeasureTool(viewer);
 measureBtn.addEventListener("click", () => {
@@ -347,6 +349,12 @@ measureBtn.addEventListener("click", () => {
 });
 measureStraight.addEventListener("change", (e) => {
   measureTool.setStraightLineVisible(e.target.checked);
+});
+measureVertical.addEventListener("change", (e) => {
+  measureTool.setVerticalLineVisible(e.target.checked);
+});
+measureHorizontal.addEventListener("change", (e) => {
+  measureTool.setHorizontalLineVisible(e.target.checked);
 });
 measureGround.addEventListener("change", (e) => {
   measureTool.setGroundLineVisible(e.target.checked);

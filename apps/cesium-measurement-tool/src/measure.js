@@ -40,7 +40,9 @@ export function initMeasureTool(viewer) {
   const polylines = scene.primitives.add(new PolylineCollection());
   let point1 = null;
   let point2 = null;
-  let straightLines = [];
+  let straightLine = null;
+  let verticalLine = null;
+  let horizontalLine = null;
   let groundLine = null;
   let distanceLabel = null;
   let horizontalLabel = null;
@@ -48,6 +50,8 @@ export function initMeasureTool(viewer) {
   let bearingLabel = null;
   let enabled = false;
   let straightLineVisible = true;
+  let verticalLineVisible = true;
+  let horizontalLineVisible = true;
   let groundLineVisible = true;
 
   const labelStyle = {
@@ -63,7 +67,7 @@ export function initMeasureTool(viewer) {
   function clear() {
     points.removeAll();
     polylines.removeAll();
-    straightLines = [];
+    straightLine = verticalLine = horizontalLine = null;
     if (groundLine) {
       viewer.entities.remove(groundLine);
     }
@@ -143,32 +147,30 @@ export function initMeasureTool(viewer) {
       carto1.height,
     );
 
-    straightLines = [
-      polylines.add({
-        positions: [p1, p2],
-        width: 1,
-        show: straightLineVisible,
-        material: new Material({
-          fabric: { type: "Color", uniforms: { color: LINE_COLOR } },
-        }),
+    straightLine = polylines.add({
+      positions: [p1, p2],
+      width: 1,
+      show: straightLineVisible,
+      material: new Material({
+        fabric: { type: "Color", uniforms: { color: LINE_COLOR } },
       }),
-      polylines.add({
-        positions: [p2, corner],
-        width: 1,
-        show: straightLineVisible,
-        material: new Material({
-          fabric: { type: "PolylineDash", uniforms: { color: LINE_COLOR } },
-        }),
+    });
+    verticalLine = polylines.add({
+      positions: [p2, corner],
+      width: 1,
+      show: verticalLineVisible,
+      material: new Material({
+        fabric: { type: "PolylineDash", uniforms: { color: LINE_COLOR } },
       }),
-      polylines.add({
-        positions: [p1, corner],
-        width: 1,
-        show: straightLineVisible,
-        material: new Material({
-          fabric: { type: "PolylineDash", uniforms: { color: LINE_COLOR } },
-        }),
+    });
+    horizontalLine = polylines.add({
+      positions: [p1, corner],
+      width: 1,
+      show: horizontalLineVisible,
+      material: new Material({
+        fabric: { type: "PolylineDash", uniforms: { color: LINE_COLOR } },
       }),
-    ];
+    });
 
     groundLine = viewer.entities.add({
       show: groundLineVisible,
@@ -230,8 +232,20 @@ export function initMeasureTool(viewer) {
     },
     setStraightLineVisible(value) {
       straightLineVisible = value;
-      for (const line of straightLines) {
-        line.show = value;
+      if (straightLine) {
+        straightLine.show = value;
+      }
+    },
+    setVerticalLineVisible(value) {
+      verticalLineVisible = value;
+      if (verticalLine) {
+        verticalLine.show = value;
+      }
+    },
+    setHorizontalLineVisible(value) {
+      horizontalLineVisible = value;
+      if (horizontalLine) {
+        horizontalLine.show = value;
       }
     },
     setGroundLineVisible(value) {
