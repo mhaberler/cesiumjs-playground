@@ -64,6 +64,16 @@ function imageryLayers(kind) {
   if (kind === "osm") {
     return [new OpenStreetMapImageryProvider({ url: "https://tile.openstreetmap.org/" })];
   }
+  if (kind === "opentopo") {
+    return [
+      new UrlTemplateImageryProvider({
+        url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+        subdomains: ["a", "b", "c"],
+        maximumLevel: 17,
+        credit: "© OpenStreetMap contributors, SRTM | © OpenTopoMap (CC-BY-SA)",
+      }),
+    ];
+  }
   return [
     new UrlTemplateImageryProvider({
       url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
