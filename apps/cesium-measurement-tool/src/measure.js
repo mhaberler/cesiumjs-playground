@@ -40,6 +40,8 @@ export function initMeasureTool(viewer) {
   const polylines = scene.primitives.add(new PolylineCollection());
   let point1 = null;
   let point2 = null;
+  let lastCarto1 = null;
+  let lastCarto2 = null;
   let straightLine = null;
   let verticalLine = null;
   let horizontalLine = null;
@@ -68,6 +70,7 @@ export function initMeasureTool(viewer) {
     points.removeAll();
     clearLinesAndLabels();
     point1 = point2 = null;
+    lastCarto1 = lastCarto2 = null;
   }
 
   function midpoint(carto1, carto2, height) {
@@ -113,6 +116,8 @@ export function initMeasureTool(viewer) {
   }
 
   function addLines(carto1, carto2) {
+    lastCarto1 = carto1;
+    lastCarto2 = carto2;
     const p1 = Cartesian3.fromRadians(
       carto1.longitude,
       carto1.latitude,
@@ -276,6 +281,32 @@ export function initMeasureTool(viewer) {
       if (groundLine) {
         groundLine.show = value;
       }
+    },
+    refreshGroundLine() {
+      // clampToGround entities can go blank across an instant (non-morph)
+      // scene mode switch; re-adding rebuilds the underlying ground
+      // primitive for the new mode.
+      if (!lastCarto1 || !lastCarto2) {
+        return;
+      }
+      if (groundLine) {
+        viewer.entities.remove(groundLine);
+      }
+      groundLine = viewer.entities.add({
+        show: groundLineVisible,
+        polyline: {
+          positions: [
+            Cartesian3.fromRadians(lastCarto1.longitude, lastCarto1.latitude),
+            Cartesian3.fromRadians(lastCarto2.longitude, lastCarto2.latitude),
+          ],
+          width: 4,
+          clampToGround: true,
+          material: new PolylineDashMaterialProperty({
+            color: GROUND_LINE_COLOR,
+            dashLength: 12,
+          }),
+        },
+      });
     },
   };
 }

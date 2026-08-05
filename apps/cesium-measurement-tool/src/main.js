@@ -49,6 +49,8 @@ const viewer = new Viewer("cesiumContainer", {
 });
 viewer.scene.globe.depthTestAgainstTerrain = true;
 
+const measureTool = initMeasureTool(viewer);
+
 function goHome() {
   // Fly to Stiwoll, Austria to show off terrain relief.
   viewer.camera.flyTo({
@@ -194,6 +196,7 @@ sceneModeBtn.addEventListener("click", () => {
   }
   entryPose = cam.position.clone();
   updateSceneModeLabel();
+  measureTool.refreshGroundLine();
 });
 updateSceneModeLabel();
 
@@ -340,7 +343,6 @@ const measureStraight = document.getElementById("measure-straight");
 const measureVertical = document.getElementById("measure-vertical");
 const measureHorizontal = document.getElementById("measure-horizontal");
 const measureGround = document.getElementById("measure-ground");
-const measureTool = initMeasureTool(viewer);
 measureBtn.addEventListener("click", () => {
   const next = !measureTool.isEnabled();
   measureTool.setEnabled(next);
