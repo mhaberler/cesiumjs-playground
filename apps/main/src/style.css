@@ -32,3 +32,78 @@ body {
 #note {
   color: #ffb4b4;
 }
+
+#controls-right {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 1;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font: 13px sans-serif;
+}
+
+#controls-right button {
+  background: rgba(38, 38, 38, 0.8);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font: inherit;
+}
+
+#controls-right button:hover {
+  background: rgba(58, 58, 58, 0.9);
+}
+
+#geocode-wrap {
+  position: relative;
+}
+
+#geocode {
+  background: rgba(38, 38, 38, 0.8);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  padding: 6px 10px;
+  font: inherit;
+  width: 220px;
+}
+
+#geocode::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+#geocode-results {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  width: 100%;
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+  background: rgba(38, 38, 38, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+#geocode-results li {
+  padding: 6px 10px;
+  cursor: pointer;
+  color: white;
+}
+
+#geocode-results li.active,
+#geocode-results li:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+#geocode-results .geo-sub {
+  display: block;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+}
