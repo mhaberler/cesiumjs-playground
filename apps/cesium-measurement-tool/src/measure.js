@@ -38,6 +38,7 @@ export function initMeasureTool(viewer) {
   const polylines = scene.primitives.add(new PolylineCollection());
   let point1 = null;
   let point2 = null;
+  let groundLine = null;
   let distanceLabel = null;
   let horizontalLabel = null;
   let verticalLabel = null;
@@ -57,6 +58,10 @@ export function initMeasureTool(viewer) {
   function clear() {
     points.removeAll();
     polylines.removeAll();
+    if (groundLine) {
+      viewer.entities.remove(groundLine);
+    }
+    groundLine = null;
     if (distanceLabel) {
       viewer.entities.remove(distanceLabel);
     }
@@ -152,6 +157,18 @@ export function initMeasureTool(viewer) {
       material: new Material({
         fabric: { type: "PolylineDash", uniforms: { color: LINE_COLOR } },
       }),
+    });
+
+    groundLine = viewer.entities.add({
+      polyline: {
+        positions: [
+          Cartesian3.fromRadians(carto1.longitude, carto1.latitude),
+          Cartesian3.fromRadians(carto2.longitude, carto2.latitude),
+        ],
+        width: 1,
+        clampToGround: true,
+        material: LINE_COLOR,
+      },
     });
   }
 
