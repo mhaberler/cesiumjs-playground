@@ -29,9 +29,41 @@ Cesium ion features (world terrain, OSM Buildings) need a Cesium ion access toke
 
 ## Adding a new app
 
-1. Copy an existing app folder, e.g. `cp -r apps/demo1 apps/demo3`.
-2. Update `base` and `CESIUM_BASE_URL` in `apps/demo3/vite.config.js` to `/cesiumjs-playground/demo3/`.
-3. Add a build step for it in `.github/workflows/deploy.yml`.
+Say the new app is called `demo3`.
+
+1. Copy an existing app folder, then drop its lockfile and local env file (regenerated below):
+
+   ```sh
+   cp -r apps/demo1 apps/demo3
+   rm -rf apps/demo3/node_modules apps/demo3/dist apps/demo3/bun.lock apps/demo3/.env.local
+   ```
+
+2. In `apps/demo3/vite.config.js`, update `base` and `CESIUM_BASE_URL` to the new subpath:
+
+   ```js
+   base: "/cesiumjs-playground/demo3/",
+   // ...
+   CESIUM_BASE_URL: JSON.stringify(`/cesiumjs-playground/demo3/${cesiumBaseUrl}`),
+   ```
+
+3. In `apps/demo3/package.json`, rename `"name"` to `"cesiumjs-playground-demo3"`.
+
+4. Install deps and set up local dev's ion token:
+
+   ```sh
+   cd apps/demo3 && bun install
+   cp .env.local.example .env.local   # fill in VITE_CESIUM_ION_TOKEN
+   bun run dev
+   ```
+
+5. In `.github/workflows/deploy.yml`, add a build step for `demo3` (copy the `demo1` step, replace the path) and extend the "Assemble combined site" step:
+
+   ```sh
+   mkdir -p site/demo3
+   cp -r apps/demo3/dist/. site/demo3/
+   ```
+
+6. Once deployed, add the new URL to "Live apps" and the new folder to "Structure" above.
 
 ## Deployment
 
