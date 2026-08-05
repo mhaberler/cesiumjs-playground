@@ -34,7 +34,7 @@
     "eslint-plugin-html": "^7.1.0",
     "prettier": "^3.2.4",
     "vite": "^5.0.8",
-    "vite-plugin-static-copy": "^1.0.0"
+    "vite-plugin-static-copy": "3.4.0"
   },
   "dependencies": {
     "cesium": "^1.114.0"
