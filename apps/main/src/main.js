@@ -107,18 +107,29 @@ setImagery("esri");
 setTerrain("reearth");
 
 // --- 2D/3D toggle ------------------------------------------------------
+// morphTo2D/morphTo3D reset to a wide default view instead of preserving
+// framing, so capture the current view and restore it once the morph ends.
 const sceneModeBtn = document.getElementById("scene-mode");
+let preMorphRectangle = null;
+
 function updateSceneModeLabel() {
   sceneModeBtn.textContent = viewer.scene.mode === SceneMode.SCENE3D ? "2D" : "3D";
 }
 sceneModeBtn.addEventListener("click", () => {
+  preMorphRectangle = viewer.camera.computeViewRectangle();
   if (viewer.scene.mode === SceneMode.SCENE3D) {
     viewer.scene.morphTo2D(1.0);
   } else {
     viewer.scene.morphTo3D(1.0);
   }
 });
-viewer.scene.morphComplete.addEventListener(updateSceneModeLabel);
+viewer.scene.morphComplete.addEventListener(() => {
+  updateSceneModeLabel();
+  if (preMorphRectangle) {
+    viewer.camera.setView({ destination: preMorphRectangle });
+    preMorphRectangle = null;
+  }
+});
 updateSceneModeLabel();
 
 // --- Geocoder (Photon), ported from mhaberler/trajectories geocode.js --
