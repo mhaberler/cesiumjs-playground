@@ -66,25 +66,7 @@ export function initMeasureTool(viewer) {
 
   function clear() {
     points.removeAll();
-    polylines.removeAll();
-    straightLine = verticalLine = horizontalLine = null;
-    if (groundLine) {
-      viewer.entities.remove(groundLine);
-    }
-    groundLine = null;
-    if (distanceLabel) {
-      viewer.entities.remove(distanceLabel);
-    }
-    if (horizontalLabel) {
-      viewer.entities.remove(horizontalLabel);
-    }
-    if (verticalLabel) {
-      viewer.entities.remove(verticalLabel);
-    }
-    if (bearingLabel) {
-      viewer.entities.remove(bearingLabel);
-    }
-    distanceLabel = horizontalLabel = verticalLabel = bearingLabel = null;
+    clearLinesAndLabels();
     point1 = point2 = null;
   }
 
@@ -189,36 +171,86 @@ export function initMeasureTool(viewer) {
     });
   }
 
-  const handler = new ScreenSpaceEventHandler(scene.canvas);
-  handler.setInputAction((click) => {
-    if (!enabled) {
-      return;
+  function clearLinesAndLabels() {
+    polylines.removeAll();
+    straightLine = verticalLine = horizontalLine = null;
+    if (groundLine) {
+      viewer.entities.remove(groundLine);
     }
-    const cartesian = viewer.scene.pickPosition(click.position);
-    if (!cartesian) {
-      return;
+    groundLine = null;
+    if (distanceLabel) {
+      viewer.entities.remove(distanceLabel);
     }
+    if (horizontalLabel) {
+      viewer.entities.remove(horizontalLabel);
+    }
+    if (verticalLabel) {
+      viewer.entities.remove(verticalLabel);
+    }
+    if (bearingLabel) {
+      viewer.entities.remove(bearingLabel);
+    }
+    distanceLabel = horizontalLabel = verticalLabel = bearingLabel = null;
+  }
 
-    if (points.length >= 2) {
-      clear();
-    }
-
-    if (points.length === 0) {
-      point1 = points.add({ position: cartesian, color: LINE_COLOR });
-      return;
-    }
-
-    point2 = points.add({ position: cartesian, color: LINE_COLOR });
+  function updateMeasurement(cartesian) {
+    point2.position = cartesian;
     const carto1 = Cartographic.fromCartesian(point1.position);
-    const carto2 = Cartographic.fromCartesian(point2.position);
+    const carto2 = Cartographic.fromCartesian(cartesian);
 
+    clearLinesAndLabels();
     addLines(carto1, carto2);
 
     const midHeight =
       Math.min(carto1.height, carto2.height) +
       Math.abs(carto2.height - carto1.height) / 2;
     addLabels(carto1, carto2, midHeight);
-  }, ScreenSpaceEventType.LEFT_CLICK);
+  }
+
+  let dragging = false;
+
+  const handler = new ScreenSpaceEventHandler(scene.canvas);
+  handler.setInputAction((event) => {
+    if (!enabled) {
+      return;
+    }
+    const cartesian = viewer.scene.pickPosition(event.position);
+    if (!cartesian) {
+      return;
+    }
+
+    clear();
+    point1 = points.add({ position: cartesian, color: LINE_COLOR });
+    point2 = points.add({ position: cartesian, color: LINE_COLOR });
+    dragging = true;
+    scene.screenSpaceCameraController.enableRotate = false;
+    scene.screenSpaceCameraController.enableTilt = false;
+  }, ScreenSpaceEventType.LEFT_DOWN);
+
+  handler.setInputAction((event) => {
+    if (!enabled || !dragging) {
+      return;
+    }
+    const cartesian = viewer.scene.pickPosition(event.endPosition);
+    if (!cartesian) {
+      return;
+    }
+    updateMeasurement(cartesian);
+  }, ScreenSpaceEventType.MOUSE_MOVE);
+
+  handler.setInputAction((event) => {
+    if (!enabled || !dragging) {
+      return;
+    }
+    dragging = false;
+    scene.screenSpaceCameraController.enableRotate = true;
+    scene.screenSpaceCameraController.enableTilt = true;
+
+    const cartesian = viewer.scene.pickPosition(event.position);
+    if (cartesian) {
+      updateMeasurement(cartesian);
+    }
+  }, ScreenSpaceEventType.LEFT_UP);
 
   return {
     setEnabled(value) {
