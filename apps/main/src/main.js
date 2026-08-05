@@ -1,5 +1,6 @@
 import {
   Cartesian3,
+  Ion,
   Math as CesiumMath,
   Terrain,
   Viewer,
@@ -7,6 +8,10 @@ import {
 } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./style.css";
+
+if (import.meta.env.VITE_CESIUM_ION_TOKEN) {
+  Ion.defaultAccessToken = import.meta.env.VITE_CESIUM_ION_TOKEN;
+}
 
 // Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
 const viewer = new Viewer("cesiumContainer", {

@@ -25,6 +25,8 @@ Each app is an independent Vite project with its own `package.json`. `vite.confi
 cd apps/main && bun install && bun run dev
 ```
 
+Cesium ion features (world terrain, OSM Buildings) need a Cesium ion access token. Copy `.env.local.example` to `.env.local` in each app and fill in `VITE_CESIUM_ION_TOKEN`. In CI the token comes from the `CESIUM_ION_TOKEN` repo secret.
+
 ## Adding a new app
 
 1. Copy an existing app folder, e.g. `cp -r apps/demo1 apps/demo3`.

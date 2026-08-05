@@ -27,18 +27,24 @@ jobs:
           cd apps/main
           bun install --frozen-lockfile
           bun run build
+        env:
+          VITE_CESIUM_ION_TOKEN: ${{ secrets.CESIUM_ION_TOKEN }}
 
       - name: Build demo1
         run: |
           cd apps/demo1
           bun install --frozen-lockfile
           bun run build
+        env:
+          VITE_CESIUM_ION_TOKEN: ${{ secrets.CESIUM_ION_TOKEN }}
 
       - name: Build demo2
         run: |
           cd apps/demo2
           bun install --frozen-lockfile
           bun run build
+        env:
+          VITE_CESIUM_ION_TOKEN: ${{ secrets.CESIUM_ION_TOKEN }}
 
       - name: Assemble combined site
         run: |
