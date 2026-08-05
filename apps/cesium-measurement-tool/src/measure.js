@@ -11,12 +11,14 @@ import {
   Math as CesiumMath,
   PointPrimitiveCollection,
   PolylineCollection,
+  PolylineDashMaterialProperty,
   ScreenSpaceEventHandler,
   ScreenSpaceEventType,
   VerticalOrigin,
 } from "cesium";
 
 const LINE_COLOR = Color.RED;
+const GROUND_LINE_COLOR = Color.CYAN;
 
 function formatDistance(meters) {
   if (meters >= 1000) {
@@ -38,12 +40,15 @@ export function initMeasureTool(viewer) {
   const polylines = scene.primitives.add(new PolylineCollection());
   let point1 = null;
   let point2 = null;
+  let straightLines = [];
   let groundLine = null;
   let distanceLabel = null;
   let horizontalLabel = null;
   let verticalLabel = null;
   let bearingLabel = null;
   let enabled = false;
+  let straightLineVisible = true;
+  let groundLineVisible = true;
 
   const labelStyle = {
     font: "14px monospace",
@@ -58,6 +63,7 @@ export function initMeasureTool(viewer) {
   function clear() {
     points.removeAll();
     polylines.removeAll();
+    straightLines = [];
     if (groundLine) {
       viewer.entities.remove(groundLine);
     }
@@ -137,37 +143,46 @@ export function initMeasureTool(viewer) {
       carto1.height,
     );
 
-    polylines.add({
-      positions: [p1, p2],
-      width: 1,
-      material: new Material({
-        fabric: { type: "Color", uniforms: { color: LINE_COLOR } },
+    straightLines = [
+      polylines.add({
+        positions: [p1, p2],
+        width: 1,
+        show: straightLineVisible,
+        material: new Material({
+          fabric: { type: "Color", uniforms: { color: LINE_COLOR } },
+        }),
       }),
-    });
-    polylines.add({
-      positions: [p2, corner],
-      width: 1,
-      material: new Material({
-        fabric: { type: "PolylineDash", uniforms: { color: LINE_COLOR } },
+      polylines.add({
+        positions: [p2, corner],
+        width: 1,
+        show: straightLineVisible,
+        material: new Material({
+          fabric: { type: "PolylineDash", uniforms: { color: LINE_COLOR } },
+        }),
       }),
-    });
-    polylines.add({
-      positions: [p1, corner],
-      width: 1,
-      material: new Material({
-        fabric: { type: "PolylineDash", uniforms: { color: LINE_COLOR } },
+      polylines.add({
+        positions: [p1, corner],
+        width: 1,
+        show: straightLineVisible,
+        material: new Material({
+          fabric: { type: "PolylineDash", uniforms: { color: LINE_COLOR } },
+        }),
       }),
-    });
+    ];
 
     groundLine = viewer.entities.add({
+      show: groundLineVisible,
       polyline: {
         positions: [
           Cartesian3.fromRadians(carto1.longitude, carto1.latitude),
           Cartesian3.fromRadians(carto2.longitude, carto2.latitude),
         ],
-        width: 1,
+        width: 4,
         clampToGround: true,
-        material: LINE_COLOR,
+        material: new PolylineDashMaterialProperty({
+          color: GROUND_LINE_COLOR,
+          dashLength: 12,
+        }),
       },
     });
   }
@@ -212,6 +227,18 @@ export function initMeasureTool(viewer) {
     },
     isEnabled() {
       return enabled;
+    },
+    setStraightLineVisible(value) {
+      straightLineVisible = value;
+      for (const line of straightLines) {
+        line.show = value;
+      }
+    },
+    setGroundLineVisible(value) {
+      groundLineVisible = value;
+      if (groundLine) {
+        groundLine.show = value;
+      }
     },
   };
 }

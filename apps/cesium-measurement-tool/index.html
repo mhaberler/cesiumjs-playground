@@ -27,6 +27,16 @@
       <button id="home" type="button" title="Home">⌂</button>
       <button id="scene-mode" type="button">2D</button>
       <button id="measure" type="button" title="Measure distance">📏</button>
+      <div id="measure-controls" hidden>
+        <label>
+          <input id="measure-straight" type="checkbox" checked />
+          Straight line
+        </label>
+        <label>
+          <input id="measure-ground" type="checkbox" checked />
+          Clamped to ground
+        </label>
+      </div>
       <div id="geocode-wrap">
         <input id="geocode" type="text" placeholder="Search location…" autocomplete="off" />
         <ul id="geocode-results" hidden></ul>

@@ -335,9 +335,19 @@ initGeocode();
 
 // --- Measure tool --------------------------------------------------------
 const measureBtn = document.getElementById("measure");
+const measureControls = document.getElementById("measure-controls");
+const measureStraight = document.getElementById("measure-straight");
+const measureGround = document.getElementById("measure-ground");
 const measureTool = initMeasureTool(viewer);
 measureBtn.addEventListener("click", () => {
   const next = !measureTool.isEnabled();
   measureTool.setEnabled(next);
   measureBtn.classList.toggle("active", next);
+  measureControls.hidden = !next;
+});
+measureStraight.addEventListener("change", (e) => {
+  measureTool.setStraightLineVisible(e.target.checked);
+});
+measureGround.addEventListener("change", (e) => {
+  measureTool.setGroundLineVisible(e.target.checked);
 });
