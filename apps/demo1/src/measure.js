@@ -8,6 +8,7 @@ import {
   EllipsoidGeodesic,
   HorizontalOrigin,
   Material,
+  Math as CesiumMath,
   PointPrimitiveCollection,
   PolylineCollection,
   ScreenSpaceEventHandler,
@@ -22,6 +23,11 @@ function formatDistance(meters) {
   return `${meters.toFixed(2)} m`;
 }
 
+function formatBearing(radians) {
+  const degrees = (CesiumMath.toDegrees(radians) + 360) % 360;
+  return `${degrees.toFixed(1)}°`;
+}
+
 export function initMeasureTool(viewer) {
   const scene = viewer.scene;
   const geodesic = new EllipsoidGeodesic();
@@ -33,6 +39,7 @@ export function initMeasureTool(viewer) {
   let distanceLabel = null;
   let horizontalLabel = null;
   let verticalLabel = null;
+  let bearingLabel = null;
   let enabled = false;
 
   const labelStyle = {
@@ -51,7 +58,8 @@ export function initMeasureTool(viewer) {
     if (distanceLabel) viewer.entities.remove(distanceLabel);
     if (horizontalLabel) viewer.entities.remove(horizontalLabel);
     if (verticalLabel) viewer.entities.remove(verticalLabel);
-    distanceLabel = horizontalLabel = verticalLabel = null;
+    if (bearingLabel) viewer.entities.remove(bearingLabel);
+    distanceLabel = horizontalLabel = verticalLabel = bearingLabel = null;
     point1 = point2 = null;
   }
 
@@ -78,6 +86,10 @@ export function initMeasureTool(viewer) {
     verticalLabel = viewer.entities.add({
       position: Cartesian3.fromRadians(carto2.longitude, carto2.latitude, midHeight),
       label: { ...labelStyle, text: formatDistance(verticalMeters) },
+    });
+    bearingLabel = viewer.entities.add({
+      position: Cartesian3.fromRadians(carto1.longitude, carto1.latitude, carto1.height),
+      label: { ...labelStyle, text: formatBearing(geodesic.startHeading), pixelOffset: new Cartesian2(0, -20) },
     });
   }
 
