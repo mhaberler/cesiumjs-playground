@@ -30,9 +30,9 @@ jobs:
         env:
           VITE_CESIUM_ION_TOKEN: ${{ secrets.CESIUM_ION_TOKEN }}
 
-      - name: Build demo1
+      - name: Build cesium-measurement-tool
         run: |
-          cd apps/demo1
+          cd apps/cesium-measurement-tool
           bun install --frozen-lockfile
           bun run build
         env:
@@ -50,8 +50,8 @@ jobs:
         run: |
           mkdir -p site
           cp -r apps/main/dist/. site/
-          mkdir -p site/demo1 site/demo2
-          cp -r apps/demo1/dist/. site/demo1/
+          mkdir -p site/cesium-measurement-tool site/demo2
+          cp -r apps/cesium-measurement-tool/dist/. site/cesium-measurement-tool/
           cp -r apps/demo2/dist/. site/demo2/
 
       - uses: actions/upload-pages-artifact@v3

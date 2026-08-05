@@ -8,12 +8,12 @@ const cesiumBaseUrl = "cesiumStatic";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: "/cesiumjs-playground/demo1/",
+  base: "/cesiumjs-playground/cesium-measurement-tool/",
   define: {
     // Define relative base path in cesium for loading assets
     // https://vitejs.dev/config/shared-options.html#define
     CESIUM_BASE_URL: JSON.stringify(
-      `/cesiumjs-playground/demo1/${cesiumBaseUrl}`,
+      `/cesiumjs-playground/cesium-measurement-tool/${cesiumBaseUrl}`,
     ),
   },
   plugins: [

@@ -1,4 +1,10 @@
-# cesium-vite-example
+# cesium-measurement-tool
+
+Adds a click-to-measure distance tool (horizontal, vertical, 3D, and bearing) on top of the base [CesiumGS/cesium-vite-example](https://github.com/CesiumGS/cesium-vite-example) setup. The measurement logic in [`src/measure.js`](./src/measure.js) is ported from [mokrayaGISka/cesium_measurementTool](https://github.com/mokrayaGISka/cesium_measurementTool).
+
+---
+
+## cesium-vite-example base template
 
 A minimal recommended setup for an applications using [Cesium](https://cesium.com) with [Vite](https://vitejs.dev/).
 

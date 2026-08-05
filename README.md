@@ -5,16 +5,16 @@ Multiple CesiumJS + Vite apps, each based on [CesiumGS/cesium-vite-example](http
 ## Live apps
 
 - [main](https://mhaberler.github.io/cesiumjs-playground/)
-- [demo1](https://mhaberler.github.io/cesiumjs-playground/demo1/)
+- [cesium-measurement-tool](https://mhaberler.github.io/cesiumjs-playground/cesium-measurement-tool/)
 - [demo2](https://mhaberler.github.io/cesiumjs-playground/demo2/)
 
 ## Structure
 
 ```text
 apps/
-  main/    → deployed to /
-  demo1/   → deployed to /demo1/
-  demo2/   → deployed to /demo2/
+  main/                      → deployed to /
+  cesium-measurement-tool/   → deployed to /cesium-measurement-tool/
+  demo2/                     → deployed to /demo2/
 ```
 
 Each app is an independent Vite project with its own `package.json`. `vite.config.js` sets `base` and `CESIUM_BASE_URL` to match its deployed subpath.
@@ -34,7 +34,7 @@ Say the new app is called `demo3`.
 1. Copy an existing app folder, then drop its lockfile and local env file (regenerated below):
 
    ```sh
-   cp -r apps/demo1 apps/demo3
+   cp -r apps/demo2 apps/demo3
    rm -rf apps/demo3/node_modules apps/demo3/dist apps/demo3/bun.lock apps/demo3/.env.local
    ```
 
@@ -56,7 +56,7 @@ Say the new app is called `demo3`.
    bun run dev
    ```
 
-5. In `.github/workflows/deploy.yml`, add a build step for `demo3` (copy the `demo1` step, replace the path) and extend the "Assemble combined site" step:
+5. In `.github/workflows/deploy.yml`, add a build step for `demo3` (copy the `demo2` step, replace the path) and extend the "Assemble combined site" step:
 
    ```sh
    mkdir -p site/demo3
