@@ -13,27 +13,27 @@ If you create a new Vite project with [`create-vite`](https://vitejs.dev/guide/#
 ## Running this application
 
 ```sh
-npm install
-npm run dev
+bun install
+bun run dev
 ```
 
 For the built, production version
 
 ```sh
-npm run build
-npm run preview
+bun run build
+bun run preview
 ```
 
 Navigate to `localhost:5173`. For the built version navigate to `localhost:4173`
 
 ## Available scripts
 
-- `npm run eslint` - Lint this project
-- `npm run prettier` - Format all the code to a consistant style
-- `npm run prettier-check` - Check the format of code but do not change it
-- `npm run dev` - Starts the Vite development server server at `localhost:5173`
-- `npm run build` - Runs the Vite production build
-- `npm run preview` - Starts a local preview of the production build using [`vite preview`](https://vitejs.dev/guide/cli.html#vite-preview)
+- `bun run eslint` - Lint this project
+- `bun run prettier` - Format all the code to a consistant style
+- `bun run prettier-check` - Check the format of code but do not change it
+- `bun run dev` - Starts the Vite development server server at `localhost:5173`
+- `bun run build` - Runs the Vite production build
+- `bun run preview` - Starts a local preview of the production build using [`vite preview`](https://vitejs.dev/guide/cli.html#vite-preview)
 
 ## Requiring Cesium in your application
 
