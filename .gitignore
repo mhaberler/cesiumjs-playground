@@ -4,5 +4,6 @@ dist/
 *.log
 .env
 .env.local
-.cc-history/
+.cc-history
+.playwright-mcp
 

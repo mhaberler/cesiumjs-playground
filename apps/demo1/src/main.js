@@ -14,6 +14,7 @@ import {
 } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./style.css";
+import { initMeasureTool } from "./measure.js";
 
 const REEARTH_TERRAIN_URL = "https://terrain.reearth.land/cesium-mesh/ellipsoid";
 const PHOTON = "https://photon.komoot.io";
@@ -297,3 +298,12 @@ function initGeocode() {
 }
 
 initGeocode();
+
+// --- Measure tool --------------------------------------------------------
+const measureBtn = document.getElementById("measure");
+const measureTool = initMeasureTool(viewer);
+measureBtn.addEventListener("click", () => {
+  const next = !measureTool.isEnabled();
+  measureTool.setEnabled(next);
+  measureBtn.classList.toggle("active", next);
+});
