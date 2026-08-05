@@ -207,7 +207,7 @@ export function initMeasureTool(viewer) {
     addLabels(carto1, carto2, midHeight);
   }
 
-  let dragging = false;
+  let lineActive = false;
 
   const handler = new ScreenSpaceEventHandler(scene.canvas);
   handler.setInputAction((event) => {
@@ -219,16 +219,20 @@ export function initMeasureTool(viewer) {
       return;
     }
 
+    if (lineActive) {
+      updateMeasurement(cartesian);
+      lineActive = false;
+      return;
+    }
+
     clear();
     point1 = points.add({ position: cartesian, color: LINE_COLOR });
     point2 = points.add({ position: cartesian, color: LINE_COLOR });
-    dragging = true;
-    scene.screenSpaceCameraController.enableRotate = false;
-    scene.screenSpaceCameraController.enableTilt = false;
-  }, ScreenSpaceEventType.LEFT_DOWN);
+    lineActive = true;
+  }, ScreenSpaceEventType.LEFT_CLICK);
 
   handler.setInputAction((event) => {
-    if (!enabled || !dragging) {
+    if (!enabled || !lineActive) {
       return;
     }
     const cartesian = viewer.scene.pickPosition(event.endPosition);
@@ -238,25 +242,12 @@ export function initMeasureTool(viewer) {
     updateMeasurement(cartesian);
   }, ScreenSpaceEventType.MOUSE_MOVE);
 
-  handler.setInputAction((event) => {
-    if (!enabled || !dragging) {
-      return;
-    }
-    dragging = false;
-    scene.screenSpaceCameraController.enableRotate = true;
-    scene.screenSpaceCameraController.enableTilt = true;
-
-    const cartesian = viewer.scene.pickPosition(event.position);
-    if (cartesian) {
-      updateMeasurement(cartesian);
-    }
-  }, ScreenSpaceEventType.LEFT_UP);
-
   return {
     setEnabled(value) {
       enabled = value;
       if (!enabled) {
         clear();
+        lineActive = false;
       }
     },
     isEnabled() {
