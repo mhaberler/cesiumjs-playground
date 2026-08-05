@@ -19,7 +19,9 @@ import {
 const LINE_COLOR = Color.RED;
 
 function formatDistance(meters) {
-  if (meters >= 1000) return `${(meters / 1000).toFixed(1)} km`;
+  if (meters >= 1000) {
+    return `${(meters / 1000).toFixed(1)} km`;
+  }
   return `${meters.toFixed(2)} m`;
 }
 
@@ -55,10 +57,18 @@ export function initMeasureTool(viewer) {
   function clear() {
     points.removeAll();
     polylines.removeAll();
-    if (distanceLabel) viewer.entities.remove(distanceLabel);
-    if (horizontalLabel) viewer.entities.remove(horizontalLabel);
-    if (verticalLabel) viewer.entities.remove(verticalLabel);
-    if (bearingLabel) viewer.entities.remove(bearingLabel);
+    if (distanceLabel) {
+      viewer.entities.remove(distanceLabel);
+    }
+    if (horizontalLabel) {
+      viewer.entities.remove(horizontalLabel);
+    }
+    if (verticalLabel) {
+      viewer.entities.remove(verticalLabel);
+    }
+    if (bearingLabel) {
+      viewer.entities.remove(bearingLabel);
+    }
     distanceLabel = horizontalLabel = verticalLabel = bearingLabel = null;
     point1 = point2 = null;
   }
@@ -84,44 +94,80 @@ export function initMeasureTool(viewer) {
       label: { ...labelStyle, text: formatDistance(totalMeters) },
     });
     verticalLabel = viewer.entities.add({
-      position: Cartesian3.fromRadians(carto2.longitude, carto2.latitude, midHeight),
+      position: Cartesian3.fromRadians(
+        carto2.longitude,
+        carto2.latitude,
+        midHeight,
+      ),
       label: { ...labelStyle, text: formatDistance(verticalMeters) },
     });
     bearingLabel = viewer.entities.add({
-      position: Cartesian3.fromRadians(carto1.longitude, carto1.latitude, carto1.height),
-      label: { ...labelStyle, text: formatBearing(geodesic.startHeading), pixelOffset: new Cartesian2(0, -20) },
+      position: Cartesian3.fromRadians(
+        carto1.longitude,
+        carto1.latitude,
+        carto1.height,
+      ),
+      label: {
+        ...labelStyle,
+        text: formatBearing(geodesic.startHeading),
+        pixelOffset: new Cartesian2(0, -20),
+      },
     });
   }
 
   function addLines(carto1, carto2) {
-    const p1 = Cartesian3.fromRadians(carto1.longitude, carto1.latitude, carto1.height);
-    const p2 = Cartesian3.fromRadians(carto2.longitude, carto2.latitude, carto2.height);
-    const corner = Cartesian3.fromRadians(carto2.longitude, carto2.latitude, carto1.height);
+    const p1 = Cartesian3.fromRadians(
+      carto1.longitude,
+      carto1.latitude,
+      carto1.height,
+    );
+    const p2 = Cartesian3.fromRadians(
+      carto2.longitude,
+      carto2.latitude,
+      carto2.height,
+    );
+    const corner = Cartesian3.fromRadians(
+      carto2.longitude,
+      carto2.latitude,
+      carto1.height,
+    );
 
     polylines.add({
       positions: [p1, p2],
       width: 1,
-      material: new Material({ fabric: { type: "Color", uniforms: { color: LINE_COLOR } } }),
+      material: new Material({
+        fabric: { type: "Color", uniforms: { color: LINE_COLOR } },
+      }),
     });
     polylines.add({
       positions: [p2, corner],
       width: 1,
-      material: new Material({ fabric: { type: "PolylineDash", uniforms: { color: LINE_COLOR } } }),
+      material: new Material({
+        fabric: { type: "PolylineDash", uniforms: { color: LINE_COLOR } },
+      }),
     });
     polylines.add({
       positions: [p1, corner],
       width: 1,
-      material: new Material({ fabric: { type: "PolylineDash", uniforms: { color: LINE_COLOR } } }),
+      material: new Material({
+        fabric: { type: "PolylineDash", uniforms: { color: LINE_COLOR } },
+      }),
     });
   }
 
   const handler = new ScreenSpaceEventHandler(scene.canvas);
   handler.setInputAction((click) => {
-    if (!enabled) return;
+    if (!enabled) {
+      return;
+    }
     const cartesian = viewer.scene.pickPosition(click.position);
-    if (!cartesian) return;
+    if (!cartesian) {
+      return;
+    }
 
-    if (points.length >= 2) clear();
+    if (points.length >= 2) {
+      clear();
+    }
 
     if (points.length === 0) {
       point1 = points.add({ position: cartesian, color: LINE_COLOR });
@@ -135,14 +181,17 @@ export function initMeasureTool(viewer) {
     addLines(carto1, carto2);
 
     const midHeight =
-      Math.min(carto1.height, carto2.height) + Math.abs(carto2.height - carto1.height) / 2;
+      Math.min(carto1.height, carto2.height) +
+      Math.abs(carto2.height - carto1.height) / 2;
     addLabels(carto1, carto2, midHeight);
   }, ScreenSpaceEventType.LEFT_CLICK);
 
   return {
     setEnabled(value) {
       enabled = value;
-      if (!enabled) clear();
+      if (!enabled) {
+        clear();
+      }
     },
     isEnabled() {
       return enabled;

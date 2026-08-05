@@ -16,7 +16,8 @@ import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./style.css";
 import { initMeasureTool } from "./measure.js";
 
-const REEARTH_TERRAIN_URL = "https://terrain.reearth.land/cesium-mesh/ellipsoid";
+const REEARTH_TERRAIN_URL =
+  "https://terrain.reearth.land/cesium-mesh/ellipsoid";
 const PHOTON = "https://photon.komoot.io";
 const SHOW_TIMELINE = false;
 
@@ -63,13 +64,18 @@ document.getElementById("home").addEventListener("click", goHome);
 
 function imageryLayers(kind) {
   if (kind === "osm") {
-    return [new OpenStreetMapImageryProvider({ url: "https://tile.openstreetmap.org/" })];
+    return [
+      new OpenStreetMapImageryProvider({
+        url: "https://tile.openstreetmap.org/",
+      }),
+    ];
   }
   return [
     new UrlTemplateImageryProvider({
       url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
       maximumLevel: 19,
-      credit: "© Esri, USDA, USGS © OpenStreetMap contributors, and the GIS user community",
+      credit:
+        "© Esri, USDA, USGS © OpenStreetMap contributors, and the GIS user community",
     }),
     new UrlTemplateImageryProvider({
       url: "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
@@ -80,7 +86,9 @@ function imageryLayers(kind) {
 
 function setImagery(kind) {
   viewer.imageryLayers.removeAll();
-  for (const p of imageryLayers(kind)) viewer.imageryLayers.addImageryProvider(p);
+  for (const p of imageryLayers(kind)) {
+    viewer.imageryLayers.addImageryProvider(p);
+  }
 }
 
 async function setTerrain(kind) {
@@ -90,7 +98,9 @@ async function setTerrain(kind) {
     if (kind === "reearth") {
       provider = await CesiumTerrainProvider.fromUrl(REEARTH_TERRAIN_URL);
     } else if (kind === "ion") {
-      if (!import.meta.env.VITE_CESIUM_ION_TOKEN) throw new Error("Ion token missing");
+      if (!import.meta.env.VITE_CESIUM_ION_TOKEN) {
+        throw new Error("Ion token missing");
+      }
       provider = await createWorldTerrainAsync();
     }
   } catch (err) {
@@ -121,7 +131,8 @@ let saved2D = null; // { lon, lat, height } — 2D center + scale
 let entryPose = null; // camera position when the current mode was entered
 
 function updateSceneModeLabel() {
-  sceneModeBtn.textContent = viewer.scene.mode === SceneMode.SCENE3D ? "2D" : "3D";
+  sceneModeBtn.textContent =
+    viewer.scene.mode === SceneMode.SCENE3D ? "2D" : "3D";
 }
 
 // Terrain point at screen center + its camera distance: the anchor a
@@ -150,7 +161,9 @@ sceneModeBtn.addEventListener("click", () => {
     !entryPose || !Cartesian3.equalsEpsilon(cam.position, entryPose, 0, 1.0);
 
   if (viewer.scene.mode === SceneMode.SCENE3D) {
-    if (moved) saved2D = null; // 2D should follow the new 3D view
+    if (moved) {
+      saved2D = null;
+    } // 2D should follow the new 3D view
     saved3D = {
       destination: cam.position.clone(),
       orientation: { heading: cam.heading, pitch: cam.pitch, roll: cam.roll },
@@ -158,15 +171,23 @@ sceneModeBtn.addEventListener("click", () => {
     const anchor = viewAnchor();
     viewer.scene.mode = SceneMode.SCENE2D;
     const v = saved2D ?? anchor;
-    cam.setView({ destination: Cartesian3.fromRadians(v.lon, v.lat, v.height) });
+    cam.setView({
+      destination: Cartesian3.fromRadians(v.lon, v.lat, v.height),
+    });
   } else {
-    if (moved) saved3D = null; // 3D should follow the new 2D view
+    if (moved) {
+      saved3D = null;
+    } // 3D should follow the new 2D view
     const c = cam.positionCartographic;
     saved2D = { lon: c.longitude, lat: c.latitude, height: c.height };
     viewer.scene.mode = SceneMode.SCENE3D;
     cam.setView(
       saved3D ?? {
-        destination: Cartesian3.fromRadians(saved2D.lon, saved2D.lat, saved2D.height),
+        destination: Cartesian3.fromRadians(
+          saved2D.lon,
+          saved2D.lat,
+          saved2D.height,
+        ),
         orientation: { heading: 0, pitch: -CesiumMath.PI_OVER_TWO, roll: 0 },
       },
     );
@@ -196,7 +217,9 @@ function debounce(fn, ms) {
 async function photonSearch(q) {
   const url = `${PHOTON}/api/?${new URLSearchParams({ q, limit: "5", lang: "en" })}`;
   const resp = await fetch(url);
-  if (!resp.ok) throw new Error(`Photon ${resp.status}`);
+  if (!resp.ok) {
+    throw new Error(`Photon ${resp.status}`);
+  }
   const data = await resp.json();
   return Array.isArray(data.features) ? data.features : [];
 }
@@ -224,7 +247,9 @@ function initGeocode() {
     hits.forEach((f, i) => {
       const { name, sub } = featureLabel(f.properties || {});
       const li = document.createElement("li");
-      if (i === active) li.classList.add("active");
+      if (i === active) {
+        li.classList.add("active");
+      }
       li.appendChild(document.createTextNode(name));
       if (sub) {
         const span = document.createElement("span");
@@ -243,14 +268,19 @@ function initGeocode() {
 
   function pick(i) {
     const f = hits[i];
-    if (!f?.geometry?.coordinates) return;
+    if (!f?.geometry?.coordinates) {
+      return;
+    }
     const [lon, lat] = f.geometry.coordinates;
     const { name, sub } = featureLabel(f.properties || {});
     input.value = sub ? `${name}, ${sub}` : name;
     hide();
     viewer.camera.flyTo({
       destination: Cartesian3.fromDegrees(lon, lat, 3000),
-      orientation: { heading: CesiumMath.toRadians(0.0), pitch: CesiumMath.toRadians(-30.0) },
+      orientation: {
+        heading: CesiumMath.toRadians(0.0),
+        pitch: CesiumMath.toRadians(-30.0),
+      },
     });
   }
 
@@ -272,7 +302,9 @@ function initGeocode() {
   input.addEventListener("input", runSearch);
   input.addEventListener("keydown", (e) => {
     if (list.hidden || !hits.length) {
-      if (e.key === "Escape") hide();
+      if (e.key === "Escape") {
+        hide();
+      }
       return;
     }
     if (e.key === "ArrowDown") {
@@ -285,7 +317,9 @@ function initGeocode() {
       render();
     } else if (e.key === "Enter") {
       e.preventDefault();
-      if (active >= 0) pick(active);
+      if (active >= 0) {
+        pick(active);
+      }
     } else if (e.key === "Escape") {
       e.preventDefault();
       hide();
