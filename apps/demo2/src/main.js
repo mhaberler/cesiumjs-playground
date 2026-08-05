@@ -1,5 +1,7 @@
 import {
+  Cartesian2,
   Cartesian3,
+  Cartographic,
   CesiumTerrainProvider,
   EllipsoidTerrainProvider,
   Ion,
@@ -107,28 +109,69 @@ setImagery("esri");
 setTerrain("reearth");
 
 // --- 2D/3D toggle ------------------------------------------------------
-// morphTo2D/morphTo3D reset to a wide default view instead of preserving
-// framing, so capture the current view and restore it once the morph ends.
+// Instant switch (no morph fly-out) with per-mode camera state. Each
+// mode's exact pose is restored verbatim on return, so repeated toggling
+// never drifts (rectangle round-trips widen a few percent per cycle);
+// navigating in one mode invalidates the other's stash so the view
+// carries over instead.
 const sceneModeBtn = document.getElementById("scene-mode");
-let preMorphRectangle = null;
+let saved3D = null; // { destination, orientation } — exact 3D pose
+let saved2D = null; // { lon, lat, height } — 2D center + scale
+let entryPose = null; // camera position when the current mode was entered
 
 function updateSceneModeLabel() {
   sceneModeBtn.textContent = viewer.scene.mode === SceneMode.SCENE3D ? "2D" : "3D";
 }
+
+// Terrain point at screen center + its camera distance: the anchor a
+// top-down view in the other mode should center on.
+function viewAnchor() {
+  const scene = viewer.scene;
+  const ray = viewer.camera.getPickRay(
+    new Cartesian2(scene.canvas.clientWidth / 2, scene.canvas.clientHeight / 2),
+  );
+  const point = ray && scene.globe.pick(ray, scene);
+  if (point) {
+    const carto = Cartographic.fromCartesian(point);
+    return {
+      lon: carto.longitude,
+      lat: carto.latitude,
+      height: Cartesian3.distance(viewer.camera.position, point),
+    };
+  }
+  const c = viewer.camera.positionCartographic;
+  return { lon: c.longitude, lat: c.latitude, height: c.height };
+}
+
 sceneModeBtn.addEventListener("click", () => {
-  preMorphRectangle = viewer.camera.computeViewRectangle();
+  const cam = viewer.camera;
+  const moved =
+    !entryPose || !Cartesian3.equalsEpsilon(cam.position, entryPose, 0, 1.0);
+
   if (viewer.scene.mode === SceneMode.SCENE3D) {
-    viewer.scene.morphTo2D(1.0);
+    if (moved) saved2D = null; // 2D should follow the new 3D view
+    saved3D = {
+      destination: cam.position.clone(),
+      orientation: { heading: cam.heading, pitch: cam.pitch, roll: cam.roll },
+    };
+    const anchor = viewAnchor();
+    viewer.scene.mode = SceneMode.SCENE2D;
+    const v = saved2D ?? anchor;
+    cam.setView({ destination: Cartesian3.fromRadians(v.lon, v.lat, v.height) });
   } else {
-    viewer.scene.morphTo3D(1.0);
+    if (moved) saved3D = null; // 3D should follow the new 2D view
+    const c = cam.positionCartographic;
+    saved2D = { lon: c.longitude, lat: c.latitude, height: c.height };
+    viewer.scene.mode = SceneMode.SCENE3D;
+    cam.setView(
+      saved3D ?? {
+        destination: Cartesian3.fromRadians(saved2D.lon, saved2D.lat, saved2D.height),
+        orientation: { heading: 0, pitch: -CesiumMath.PI_OVER_TWO, roll: 0 },
+      },
+    );
   }
-});
-viewer.scene.morphComplete.addEventListener(() => {
+  entryPose = cam.position.clone();
   updateSceneModeLabel();
-  if (preMorphRectangle) {
-    viewer.camera.setView({ destination: preMorphRectangle });
-    preMorphRectangle = null;
-  }
 });
 updateSceneModeLabel();
 
